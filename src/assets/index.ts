@@ -1,0 +1,11 @@
+export { default as ChatbotIcon } from "./Images/chatbot-icon.png";
+export { default as Digit0 } from "./Images/digits/num_0.png";
+export { default as Digit1 } from "./Images/digits/num_1.png";
+export { default as Digit2 } from "./Images/digits/num_2.png";
+export { default as Digit3 } from "./Images/digits/num_3.png";
+export { default as Digit4 } from "./Images/digits/num_4.png";
+export { default as Digit5 } from "./Images/digits/num_5.png";
+export { default as Digit6 } from "./Images/digits/num_6.png";
+export { default as Digit7 } from "./Images/digits/num_7.png";
+export { default as Digit8 } from "./Images/digits/num_8.png";
+export { default as Digit9 } from "./Images/digits/num_9.png";
