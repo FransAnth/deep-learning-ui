@@ -10,7 +10,7 @@ export interface ITableHeaders {
 
 export interface IRowData {
   rowData: any[];
-  rowActionCallback: (data: any) => void;
+  rowActionCallback?: (data: any) => void;
 }
 
 export interface IDataTable extends ITableHeaders, IRowData {}

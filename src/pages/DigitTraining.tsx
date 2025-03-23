@@ -3,19 +3,39 @@ import DigitCanvas from "../components/digit-recognition/digit-canvas";
 import DataTable from "../components/table/table";
 import { useState } from "react";
 import Pagination from "../components/pagination/pagination";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  addDataset,
+  getDatasetDbInfo,
+} from "../services/digit-recognition-services";
+import Loader from "../components/global/loader";
+import Modal from "../components/modals";
+import { CheckCircle2, CloudAlert } from "lucide-react";
 
 const DigitTraining = () => {
   const navigate = useNavigate();
   const [digit, setDigit] = useState("");
   const [dataset, setDataset] = useState<any>([]);
+  const [dataTable, refreshDataTable] = useState<boolean>(false);
+  const [dbInfo, setDbInfo] = useState<any>([]);
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
+
+  // ModalControls
+  const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
+  const [successModalOpen, setSuccessModalOpen] = useState<boolean>(false);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
 
   const tableHeaders = [
-    { title: "Digit", id: "digit", type: "text" },
-    // { title: "Data", id: "data", type: "dataPreview" },
+    { title: "Label", id: "label", type: "text" },
+    // { title: "Feature", id: "features", type: "dataPreview" },
     { title: "Created On", id: "createdOn", type: "text" },
     { title: "", id: "delete", type: "delete" },
+  ];
+
+  const datasetDbInfo = [
+    { title: "Label", id: "label", type: "text" },
+    { title: "DB Count", id: "count", type: "text" },
   ];
 
   const grayScaleCallback = (data: any) => {
@@ -35,8 +55,8 @@ const DigitTraining = () => {
       const currDataset = [...dataset];
 
       currDataset.unshift({
-        digit: digit,
-        data: data,
+        label: digit,
+        features: data,
         createdOn: formattedTime,
       });
       setDataset(currDataset);
@@ -51,6 +71,33 @@ const DigitTraining = () => {
       setDataset(currDataset);
     }
   };
+
+  const { isLoading: addingDatasets, mutate: addNewDataset } = useMutation({
+    mutationFn: addDataset,
+    onSuccess: (response: any) => {
+      console.log("Add Dataset Response", response);
+
+      setDataset([]);
+      refreshDataTable(!dataTable);
+      setSuccessModalOpen(true);
+      setConfirmModalOpen(false);
+    },
+    onError: (error: any) => {
+      console.log("Add Dataset Error", error);
+
+      setErrorModalOpen(true);
+      setConfirmModalOpen(false);
+    },
+  });
+
+  useQuery({
+    queryKey: ["DatasetDbInfoQuery", dataTable],
+    queryFn: async () => {
+      const { data } = await getDatasetDbInfo();
+      console.log("DB INFO", data);
+      setDbInfo(data);
+    },
+  });
 
   const clearTableData = () => {
     setDataset([]);
@@ -76,7 +123,7 @@ const DigitTraining = () => {
   };
   return (
     <div className="flex flex-col p-10">
-      <div className="flex">
+      <div className="flex justify-between">
         <div className="flex flex-col gap-4">
           <div className="text-4xl">Model Training</div>
           <div className="w-1/2">
@@ -113,6 +160,17 @@ const DigitTraining = () => {
             style="p-4"
             getGrayScale={grayScaleCallback}
           />
+          <div className="flex justify-center">
+            <button
+              className={`py-2 px-4 text-white rounded-md cursor-pointer ${
+                dataset.length == 0 ? "bg-secondary" : "bg-primary"
+              }`}
+              onClick={() => setConfirmModalOpen(true)}
+              disabled={dataset.length == 0}
+            >
+              Save Dataset
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col w-160">
@@ -125,7 +183,10 @@ const DigitTraining = () => {
             </button>
           </div>
           <DataTable
-            rowData={dataset.slice(pageNumber - 1, pageNumber * pageSize)}
+            rowData={dataset.slice(
+              (pageNumber - 1) * pageSize,
+              pageNumber * pageSize
+            )}
             headers={tableHeaders}
             rowActionCallback={rowActionCallback}
           />
@@ -138,7 +199,88 @@ const DigitTraining = () => {
             onSizeChange={onSizeChange}
           />
         </div>
+        <div className="flex flex-col gap-4">
+          <div className="text-center">Dataset Info</div>
+          <DataTable rowData={dbInfo} headers={datasetDbInfo} />
+        </div>
       </div>
+      {addingDatasets && <Loader />}
+
+      <Modal
+        title="Confirmation"
+        isOpen={confirmModalOpen}
+        closeModalAction={setConfirmModalOpen}
+        className="w-100"
+        children={
+          <div className="flex flex-col gap-4 items-center pt-8">
+            <span className="text-xl">Confirm Save datasets?</span>
+            <div className="flex gap-8 mt-4">
+              <button
+                className="bg-primary px-4 py-2 text-white rounded-lg cursor-pointer"
+                onClick={() => addNewDataset(dataset)}
+              >
+                Confirm
+              </button>
+              <button
+                className="bg-warning px-4 py-2 text-white rounded-lg cursor-pointer"
+                onClick={() => setConfirmModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        }
+      />
+
+      <Modal
+        title="Success"
+        isOpen={successModalOpen}
+        closeModalAction={setSuccessModalOpen}
+        className="w-100"
+        children={
+          <div className="flex flex-col items-center text-center gap-4 py-4">
+            <CheckCircle2 size={80} className="text-green-500" />
+            <div className="w-50 flex flex-col gap-2">
+              <span className="text-lg">SUCCESS!</span>
+              <span className="text-sm">
+                Dataset has been added to the database.
+              </span>
+            </div>
+
+            <button
+              className="bg-primary text-white px-4 py-2 rounded-lg cursor-pointer mt-4"
+              onClick={() => setSuccessModalOpen(false)}
+            >
+              Okay
+            </button>
+          </div>
+        }
+      />
+
+      <Modal
+        title="Error"
+        isOpen={errorModalOpen}
+        closeModalAction={setErrorModalOpen}
+        className="w-100"
+        children={
+          <div className="flex flex-col items-center text-center gap-2 py-4">
+            <CloudAlert size={80} className="text-red-500" />
+            <div className="w-50 flex flex-col gap-2">
+              <span className="text-lg">Opps!</span>
+              <span className="text-sm">
+                An error occurred while processing your request.
+              </span>
+            </div>
+
+            <button
+              className="bg-primary text-white px-4 py-2 rounded-lg cursor-pointer mt-4"
+              onClick={() => setErrorModalOpen(false)}
+            >
+              Okay
+            </button>
+          </div>
+        }
+      />
     </div>
   );
 };

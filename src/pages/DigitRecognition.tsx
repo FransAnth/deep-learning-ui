@@ -23,7 +23,7 @@ const DigitRecognition = () => {
 
   return (
     <div className="h-fit flex flex-col p-10">
-      <div className="flex">
+      <div className="flex justify-between">
         <div className="flex flex-col gap-4">
           <div className="text-4xl">DeepDigit</div>
           <div className="w-1/2">

@@ -69,7 +69,7 @@ export default function DigitCanvas({
       grayscaleValues.push(grayscale);
     }
 
-    getGrayScale(grayscaleValues);
+    getGrayScale(grayscaleValues.join(","));
     if (mode == "train") {
       clearCanvas();
     }

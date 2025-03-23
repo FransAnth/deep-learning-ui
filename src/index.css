@@ -53,3 +53,22 @@ button {
 body {
   overflow: hidden;
 }
+
+.loading-ring {
+  margin: auto;
+  border: 15px solid #e9f1f8;
+  border-radius: 50%;
+  border-top: 15px solid #4b9e73;
+  width: 100px;
+  height: 100px;
+  animation: loaderSpin 1.5s linear infinite;
+}
+
+@keyframes loaderSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
