@@ -15,8 +15,8 @@ export default function DigitCanvas({
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<any>(null);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
-  const digitPixels = 56;
-  const brushSize = 4;
+  const digitPixels = 28;
+  const brushSize = 2;
 
   const startDrawing = (e: any) => {
     setIsDrawing(true);
@@ -48,8 +48,9 @@ export default function DigitCanvas({
 
     if (lastPos.current) {
       ctx.strokeStyle = "white";
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "black";
       ctx.lineWidth = brushSize;
-      ctx.lineCap = "round";
       ctx.beginPath();
       ctx.moveTo(lastPos.current.x, lastPos.current.y);
       ctx.lineTo(pos.x, pos.y);
@@ -65,7 +66,8 @@ export default function DigitCanvas({
     const grayscaleValues = [];
 
     for (let i = 0; i < imageData.length; i += 4) {
-      const grayscale = imageData[i];
+      const grayscale = (imageData[i] / 255 - 0.5) / 0.5;
+
       grayscaleValues.push(grayscale);
     }
 
@@ -78,8 +80,7 @@ export default function DigitCanvas({
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, digitPixels, digitPixels);
+    ctx.clearRect(0, 0, digitPixels, digitPixels);
   };
 
   useEffect(() => {

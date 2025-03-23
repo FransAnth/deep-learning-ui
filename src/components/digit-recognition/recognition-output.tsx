@@ -20,7 +20,7 @@ const RecognitionOutput = ({ style }: IDigitCanvas) => {
   const predictedNumber = useDigitStore((state) => state.modelPrediction);
 
   const getDigitImage = (digit: any) => {
-    if (predictedNumber) {
+    if (predictedNumber != null) {
       const imagePaths = [
         Digit0,
         Digit1,
@@ -45,7 +45,7 @@ const RecognitionOutput = ({ style }: IDigitCanvas) => {
         {getDigitImage(Number(predictedNumber))}
       </div>
       <div className="flex justify-center p-4">
-        {predictedNumber
+        {predictedNumber != null
           ? `The Digit is ${predictedNumber} 😊`
           : "I'm all set to recognize your digit! ✨"}
       </div>

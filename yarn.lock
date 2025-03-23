@@ -1303,6 +1303,11 @@ globals@^15.15.0:
   resolved "https://registry.yarnpkg.com/globals/-/globals-15.15.0.tgz#7c4761299d41c32b075715a4ce1ede7897ff72a8"
   integrity sha512-7ACyT3wmyp3I61S4fG682L0VA2RGD9otkqGJIwNUMF1SWUombIIk+af1unuDYgMm082aHYwD+mzJvv9Iu8dsgg==
 
+gojs@^3.0.20:
+  version "3.0.20"
+  resolved "https://registry.yarnpkg.com/gojs/-/gojs-3.0.20.tgz#faa29e1e0f178a7d08c1670ac5f73eaa096ce5d3"
+  integrity sha512-ySc+c5lJqYC4D49UfS6NZo0v45lPzMnP5uwH5nXweou80CEDtSohgbTf7KaBxYVi43FocI3VtwMHUJR58cwyGQ==
+
 gopd@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/gopd/-/gopd-1.2.0.tgz#89f56b8217bdbc8802bd299df6d7f1081d7e51a1"

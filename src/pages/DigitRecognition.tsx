@@ -1,21 +1,38 @@
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, CloudAlert } from "lucide-react";
 import DigitCanvas from "../components/digit-recognition/digit-canvas";
 import RecognitionOutput from "../components/digit-recognition/recognition-output";
 import { useNavigate } from "react-router-dom";
 import { useDigitStore } from "../store/digit-recognition-store";
+import { useMutation } from "@tanstack/react-query";
+import { recognizeDigit } from "../services/digit-recognition-services";
+import { useState } from "react";
+import Modal from "../components/modals";
+import Loader from "../components/global/loader";
 
 const DigitRecognition = () => {
   const navigate = useNavigate();
   const setModelPrediction = useDigitStore((state) => state.setModelPrediction);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
 
   const goToTesting = () => {
     navigate("training");
   };
 
+  const { isLoading: gettingDigitResponse, mutate: getDigitValue } =
+    useMutation({
+      mutationFn: recognizeDigit,
+      onSuccess: (digit: any) => {
+        setModelPrediction(digit);
+      },
+      onError: (error: any) => {
+        console.log(error);
+        setErrorModalOpen(true);
+      },
+    });
+
   const grayScaleCallback = (data: any) => {
     if (data) {
-      console.log("Testing", data);
-      setModelPrediction(2);
+      getDigitValue({ pixels: data });
     } else {
       setModelPrediction(null);
     }
@@ -48,6 +65,32 @@ const DigitRecognition = () => {
         </div>
         <RecognitionOutput style="m-4" />
       </div>
+      {gettingDigitResponse && <Loader />}
+
+      <Modal
+        title="Error"
+        isOpen={errorModalOpen}
+        closeModalAction={setErrorModalOpen}
+        className="w-100"
+        children={
+          <div className="flex flex-col items-center text-center gap-2 py-4">
+            <CloudAlert size={80} className="text-red-500" />
+            <div className="w-50 flex flex-col gap-2">
+              <span className="text-lg">Opps!</span>
+              <span className="text-sm">
+                An error occurred while processing your request.
+              </span>
+            </div>
+
+            <button
+              className="bg-primary text-white px-4 py-2 rounded-lg cursor-pointer mt-4"
+              onClick={() => setErrorModalOpen(false)}
+            >
+              Okay
+            </button>
+          </div>
+        }
+      />
     </div>
   );
 };
