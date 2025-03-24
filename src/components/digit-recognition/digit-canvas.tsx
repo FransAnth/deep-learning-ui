@@ -48,7 +48,7 @@ export default function DigitCanvas({
 
     if (lastPos.current) {
       ctx.strokeStyle = "white";
-      ctx.shadowBlur = 20;
+      ctx.shadowBlur = 14;
       ctx.shadowColor = "black";
       ctx.lineWidth = brushSize;
       ctx.beginPath();
